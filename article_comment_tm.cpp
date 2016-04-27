@@ -66,7 +66,7 @@ List article_comment_tm(NumericMatrix articles, NumericMatrix comments, NumericV
         doc_id_c[i] = article_id[c];
         word_id_c[i] = w;
         word_topic_count_c(w, word_assign_c[i])++;
-        doc_topic_count_c(doc_id_c[c], word_assign_c[i])++;
+        doc_topic_count_c(doc_id_c[i], word_assign_c[i])++;
         word_count--;
         i++;
       }
@@ -77,8 +77,8 @@ List article_comment_tm(NumericMatrix articles, NumericMatrix comments, NumericV
   }
   
   for (int j = 0; j < iter; j++) {
-    NumericVector us_a(tot_words_a);
-    NumericVector us_c(tot_words_c);
+    NumericVector us_a = runif(tot_words_a);
+    NumericVector us_c = runif(tot_words_c);
     if ((j+1) % 100 == 0)
       Rcout << "Iteration: " << j << std::endl;
     
@@ -135,7 +135,37 @@ List article_comment_tm(NumericMatrix articles, NumericMatrix comments, NumericV
         }
       }
     }
-    
   }
   
+  NumericMatrix beta_a(W, K);
+  NumericMatrix beta_c(W, K);
+  NumericMatrix theta(D, K);
+  for (int k = 0; k < K; k++) {
+    for (int w = 0; w < W; w++) {
+      beta_a(w, k) = (word_topic_count_a(w, k) + eta_a) / (topic_count_a[k] + W * eta_a); 
+      beta_c(w, k) = (word_topic_count_c(w, k) + eta_c) / (topic_count_c[k] + W * eta_c);
+    } 
+    for (int d = 0; d < D; d++) {
+      theta(d, k) = (doc_topic_count_a(d, k) + doc_topic_count_c(d, k) + alpha) / 
+        (sum(doc_topic_count_a(d, _) + doc_topic_count_c(d, _)) + K * alpha);
+    }
+  }
+  
+  List result;
+  result["beta_a"] = beta_a;
+  result["beta_c"] = beta_c;
+  result["theta"] = theta;
+  result["z_a"] = word_assign_a;
+  result["z_c"] = word_assign_c;
+  result["doc_topic_count_a"] = doc_topic_count_a;
+  result["doc_topic_count_c"] = doc_topic_count_c;
+  result["word_topic_count_a"] = word_topic_count_a;
+  result["word_topic_count_c"] = word_topic_count_c;
+  result["doc_id_a"] = doc_id_a;
+  result["doc_id_c"] = doc_id_c;
+  CharacterVector class_names(1); 
+  class_names[0] = "article_comment_tm"; 
+  result.attr("class") = class_names;
+  
+  return result;
 }
