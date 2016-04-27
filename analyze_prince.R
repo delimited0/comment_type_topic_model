@@ -35,11 +35,13 @@ articles_dtm <- prince_dtm[type_id==1,]
 comments_dtm <- prince_dtm[type_id==0,]
 
 
+# run directly on rcpp code ----
+
 prince_actm <- article_comment_tm(articles = as.matrix(articles_dtm), comments = as.matrix(comments_dtm), K = 5, 
                                   article_id = article_idx, alpha = .1, eta_a = .01, eta_c = .01,
                                   iter = 1000)
 
-# debug with smaller corpus
+# debug with smaller corpus ----
 # one article and its comments
 prince_actm <- article_comment_tm(articles = as.matrix(articles_dtm[6,]), comments = as.matrix(comments_dtm[article_idx==6,]), K = 5, 
                                   article_id = rep(1, nrow(comments_dtm[article_idx==6,])), alpha = .1, eta_a = .01, eta_c = .01,
@@ -55,6 +57,11 @@ prince_actm <- article_comment_tm(articles = as.matrix(articles_dtm[c(6, 33),]),
                                   article_id = c(rep(1, sum(article_idx==6)), rep(2, sum(article_idx==33))), alpha = .1, eta_a = .01, eta_c = .01,
                                   iter = 10)
 
+# run through wrapper ----
+
+prince_actm <- actm(articles_dtm = articles_dtm, comments_dtm = comments_dtm, 
+                    article_id = article_idx, K = 10)
+prince_topics <- get_topics(prince_actm, 20)
 
 
 
