@@ -15,9 +15,9 @@ transformCorpus <- function(docs, smart=FALSE, custom=NULL) {
   docs <- tm_map(docs, content_transformer(tolower), lazy=T)
   docs <- tm_map(docs, toSpace, "-|/")
   docs <- tm_map(docs, removeNumbers, lazy=T)
-  docs <- tm_map(docs, removePunctuation, lazy=T)
+  docs <- tm_map(docs, removePunctuation)
   docs <- tm_map(docs, removeWords, stoplist, lazy=T)
-  docs <- tm_map(docs, stemDocument)
+  docs <- tm_map(docs, stemDocument, lazy=T)
   docs <- tm_map(docs, stripWhitespace, lazy=T)
   return(docs)
 }

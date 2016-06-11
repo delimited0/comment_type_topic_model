@@ -60,8 +60,31 @@ prince_actm <- article_comment_tm(articles = as.matrix(articles_dtm[c(6, 33),]),
 # run through wrapper ----
 
 prince_actm <- actm(articles_dtm = articles_dtm, comments_dtm = comments_dtm, 
-                    article_id = article_idx, K = 10)
+                    article_id = article_idx, K = 15)
 prince_topics <- get_topics(prince_actm, 20)
 
+# article comment type test run ----
 
+prince_acttm <- article_comment_types_tm(articles = as.matrix(articles_dtm), comments = as.matrix(comments_dtm), 
+                                         article_id = article_idx, K = 5, S = 2, alpha = .1, eta_a = .01, 
+                                         eta_c = .01, gamma_c = .01, iter = 200) 
 
+prince_acttm <- article_comment_types_tm(articles = as.matrix(articles_dtm[6,]), comments = as.matrix(comments_dtm[article_idx==6,]), 
+                                  article_id = rep(1, nrow(comments_dtm[article_idx==6,])), K = 5, S = 2, alpha = .1, eta_a = .01, eta_c = .01,
+                                  gamma_c = .01, iter = 1)
+prince_acttm$vocab <- colnames(articles_dtm) # attach vocab manually
+prince_topics <- get_topics(prince_acttm, 20)
+
+# one article, one comment
+prince_acttm <- article_comment_types_tm(articles = as.matrix(articles_dtm[1,]), comments = as.matrix(comments_dtm[article_idx==1,]), 
+                                         article_id = rep(1, nrow(comments_dtm[article_idx==1,])), K = 5, S = 2, alpha = .1, eta_a = .01, eta_c = .01,
+                                         gamma_c = .01, iter = 1)
+
+# one article, two comments
+prince_acttm <- article_comment_types_tm(articles = as.matrix(articles_dtm[5,]), comments = as.matrix(comments_dtm[article_idx==5,]), 
+                                         article_id = rep(1, nrow(comments_dtm[article_idx==5,])), K = 5, S = 2, alpha = .1, eta_a = .01, eta_c = .01,
+                                         gamma_c = .01, iter = 1)
+
+prince_acttm <- article_comment_types_tm(articles = as.matrix(articles_dtm[c(6, 33),]), comments = as.matrix(comments_dtm[article_idx %in% c(6, 33),]),  
+                                  article_id = c(rep(1, sum(article_idx==6)), rep(2, sum(article_idx==33))), K = 5, S = 2, alpha = .1, eta_a = .01, 
+                                  eta_c = .01, gamma_c = .01, iter = 10)

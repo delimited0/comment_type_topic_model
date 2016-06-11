@@ -1,4 +1,5 @@
-#include "util.h"
+#include <Rcpp.h>
+using namespace Rcpp;
 
 // [[Rcpp::export]]
 NumericMatrix term_score(NumericMatrix beta, int T) {

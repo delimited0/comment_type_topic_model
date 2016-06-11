@@ -1,3 +1,5 @@
+Rcpp::sourceCpp('article_comment_tm.cpp')
+
 actm <- function(articles_dtm, comments_dtm, article_id, K, alpha = 0.1, eta_a = 0.01, eta_c = 0.01,  
                 burnin = 0, iter = 2000) {
 #   article-comment topic model

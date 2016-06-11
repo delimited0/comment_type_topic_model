@@ -1,5 +1,7 @@
 // article comment
-#include "util.h"
+#include "math.h"
+#include <Rcpp.h>
+using namespace Rcpp;
 
 /*
  * article_comment_tm
