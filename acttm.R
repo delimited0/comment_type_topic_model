@@ -1,7 +1,7 @@
 Rcpp::sourceCpp('article_comment_types_tm.cpp')
 
 acttm <- function(articles_dtm, comments_dtm, article_id, K, S, alpha = 0.1, eta_a = 0.01, eta_c = 0.01,  
-                  gamma_c, burnin = 0, iter = 2000) {
+                  gamma_c = .1, burnin = 0, iter = 2000) {
   #   article-comment-type topic model
   #   articles_dtm and comments_dtm are DocumentTermMatrix (see tm package) that 
   #     must have same vocabulary

@@ -62,6 +62,18 @@ prince_actm <- article_comment_tm(articles = as.matrix(articles_dtm[c(6, 33),]),
 prince_actm <- actm(articles_dtm = articles_dtm, comments_dtm = comments_dtm, 
                     article_id = article_idx, K = 15)
 prince_topics <- get_topics(prince_actm, 20)
+prince_actm_corrs <- mapply(function(x, y){cor(x, y)}, split(prince_actm$beta_a, col(prince_actm$beta_a)),
+                                  split(prince_actm$beta_c, col(prince_actm$beta_c)))
+prince_actm2 <- actm(articles_dtm = articles_dtm, comments_dtm = comments_dtm, 
+                    article_id = article_idx, K = 5)
+prince_actm_models <- list()
+for (k in 1:5) {
+  prince_actm_models[[k]] <- actm(articles_dtm = articles_dtm, comments_dtm = comments_dtm, 
+                                  article_id = article_idx, K = k*5)
+}
+prince_scores <- lapply(prince_actm_models, score)
+sapply(prince_scores, function(x){median(x$tsr_a)})
+sapply(prince_scores, function(x){median(x$tsr_c)})
 
 # article comment type test run ----
 
@@ -88,3 +100,8 @@ prince_acttm <- article_comment_types_tm(articles = as.matrix(articles_dtm[5,]),
 prince_acttm <- article_comment_types_tm(articles = as.matrix(articles_dtm[c(6, 33),]), comments = as.matrix(comments_dtm[article_idx %in% c(6, 33),]),  
                                   article_id = c(rep(1, sum(article_idx==6)), rep(2, sum(article_idx==33))), K = 5, S = 2, alpha = .1, eta_a = .01, 
                                   eta_c = .01, gamma_c = .01, iter = 10)
+
+# acttm with wrapper
+prince_acttm <- acttm(articles_dtm = articles_dtm, comments_dtm = comments_dtm, article_id = article_idx,
+                      K = 10, S = 2, iter = 500)
+prince_topics <- get_topics(prince_acttm, 20)

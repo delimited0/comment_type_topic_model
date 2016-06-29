@@ -10,6 +10,37 @@ using namespace Rcpp;
  *              from R. article_id[j] = k -> the jth comment belongs to article k
  */
 
+double log_likelihood(double alpha, double eta_a, double eta_c, NumericMatrix theta, 
+                      NumericMatrix beta_a, NumericMatrix beta_c, 
+                      NumericVector z_a, NumericVector z_c, 
+                      NumericVector word_a, NumericVector word_c,
+                      NumericVector doc_a, NumericVector doc_c) {
+  int D = theta.nrow();
+  int K = theta.ncol();
+  double term1 = 0.0;
+  for (int d = 0; d < D; d++) {
+    term1 += sum(log(theta(d,_)));
+  }
+  term1 *= (alpha - 1.0);
+  double term2 = 0.0;
+  for (int n = 0; n < z_a.length(); n++) {
+    term2 += log(theta(doc_a[n], z_a[n]));
+    term2 += log(beta_a(word_a[n], z_a[n]));
+  }
+  double term3 = 0.0;
+  for (int n = 0; n < z_c.length(); n++) {
+    term3 += log(theta(doc_c[n], z_c[n]));
+    term3 += log(beta_c(word_c[n], z_c[n]));
+  }
+  double term4 = 0.0;
+  for (int k = 0; k < K; k++) {
+    term4 += (eta_a - 1.0) * sum(log(beta_a(_, k)));
+    term4 += (eta_c - 1.0) * sum(log(beta_c(_, k)));
+  }
+  
+  return term1 + term2 + term3 + term4;
+}
+  
 // [[Rcpp::export]]
 List article_comment_tm(NumericMatrix articles, NumericMatrix comments, NumericVector article_id,
                         int K, double alpha, double eta_a, double eta_c, int iter) {
@@ -165,6 +196,9 @@ List article_comment_tm(NumericMatrix articles, NumericMatrix comments, NumericV
   result["word_topic_count_c"] = word_topic_count_c;
   result["doc_id_a"] = doc_id_a;
   result["doc_id_c"] = doc_id_c;
+  result["log_lik"] = log_likelihood(alpha, eta_a, eta_c, theta, beta_a, beta_c,
+                                       word_assign_a, word_assign_c, word_id_a, word_id_c,
+                                       doc_id_a, doc_id_c);
   CharacterVector class_names(1); 
   class_names[0] = "article_comment_tm"; 
   result.attr("class") = class_names;
