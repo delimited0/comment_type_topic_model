@@ -60,18 +60,25 @@ prince_actm <- article_comment_tm(articles = as.matrix(articles_dtm[c(6, 33),]),
 # run through wrapper ----
 
 prince_actm <- actm(articles_dtm = articles_dtm, comments_dtm = comments_dtm, 
-                    article_id = article_idx, K = 15)
+                    article_id = article_idx, K = 40)
 prince_topics <- get_topics(prince_actm, 20)
+prince_distinct <- get_distinct_topics(prince_actm, 20)
+scores <- score(prince_actm)
+(scores$tsr_a + scores$tsr_c) / 2
 prince_actm_corrs <- mapply(function(x, y){cor(x, y)}, split(prince_actm$beta_a, col(prince_actm$beta_a)),
                                   split(prince_actm$beta_c, col(prince_actm$beta_c)))
 prince_actm2 <- actm(articles_dtm = articles_dtm, comments_dtm = comments_dtm, 
                     article_id = article_idx, K = 5)
+
 prince_actm_models <- list()
-for (k in 1:5) {
-  prince_actm_models[[k]] <- actm(articles_dtm = articles_dtm, comments_dtm = comments_dtm, 
-                                  article_id = article_idx, K = k*5)
+ks <- 35:45
+for (j in 1:length(ks)) {
+  k <- ks[j]
+  prince_actm_models[[j]] <- actm(articles_dtm = articles_dtm, comments_dtm = comments_dtm, 
+                                  article_id = article_idx, K = k, iter = 2000)
 }
 prince_scores <- lapply(prince_actm_models, score)
+model_topics <- lapply(prince_actm_models, function(x) {get_topics(x, 20)})
 sapply(prince_scores, function(x){median(x$tsr_a)})
 sapply(prince_scores, function(x){median(x$tsr_c)})
 

@@ -2,7 +2,7 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-NumericMatrix term_score(NumericMatrix beta, int T) {
+NumericMatrix term_score(NumericMatrix beta) {
   // calculate term score (Blei and Lafferty 2009)
   int W = beta.rows();
   int K = beta.cols();

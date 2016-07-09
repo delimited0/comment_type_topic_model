@@ -4,8 +4,8 @@ get_topics <- function(x, K) UseMethod("get_topics")
 
 get_topics.article_comment_tm <- function(actm, K) {
   # get top K words by term score for each topic
-  term_score_a <- term_score(actm$beta_a, K)
-  term_score_c <- term_score(actm$beta_c, K)
+  term_score_a <- term_score(actm$beta_a)
+  term_score_c <- term_score(actm$beta_c)
   vocab_mat <- matrix(data=actm$vocab, nrow=length(actm$vocab), K)
   vocab_mat_a <- apply(term_score_a, 2, function(x) {
     vocab_mat[order(x)[1:K]]
@@ -22,8 +22,8 @@ get_topics.article_comment_tm <- function(actm, K) {
 
 get_topics.article_comment_types_tm <- function(acttm, K) {
   # get top K words by term score for each topic type
-  term_score_a <- term_score(acttm$beta_a, K)
-  term_score_cs <- lapply(acttm$beta_cs, function(x) {term_score(x, K)})
+  term_score_a <- term_score(acttm$beta_a)
+  term_score_cs <- lapply(acttm$beta_cs, function(x) {term_score(x)})
   vocab_mat <- matrix(data=acttm$vocab, nrow=length(acttm$vocab), K)
   vocab_mat_a <- apply(term_score_a, 2, function(x) {
     vocab_mat[order(x)[1:K]]
@@ -40,3 +40,23 @@ get_topics.article_comment_types_tm <- function(acttm, K) {
   return(result)
 }
 
+get_distinct_topics <- function(x, K) UseMethod("get_distinct_topics")
+
+get_distinct_topics.article_comment_tm <- function(actm, K) {
+  term_score_a <- term_score(actm$beta_a)
+  term_score_c <- term_score(actm$beta_c)
+  distinct_score_a <- term_score_a - term_score_c
+  distinct_score_c <- term_score_c - term_score_a
+  vocab_mat <- matrix(data=actm$vocab, nrow=length(actm$vocab), K)
+  vocab_mat_a <- apply(distinct_score_a, 2, function(x) {
+    vocab_mat[order(x)[1:K]]
+  })
+  vocab_mat_c <- apply(distinct_score_c, 2, function(x) {
+    vocab_mat[order(x)[1:K]]
+  })
+  
+  result <- list()
+  result$article_topics <- vocab_mat_a
+  result$comment_topics <- vocab_mat_c
+  return(result)
+}
